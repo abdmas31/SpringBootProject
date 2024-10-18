@@ -4,6 +4,7 @@ import com.AbdProject.firstjobapp.company.Company;
 import com.AbdProject.firstjobapp.company.CompanyController;
 import com.AbdProject.firstjobapp.company.CompanyRepository;
 import com.AbdProject.firstjobapp.company.CompanyService;
+import com.AbdProject.firstjobapp.review.ReviewRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +12,11 @@ import java.util.Optional;
 @Service
 public class CompanyServiceImpl implements CompanyService {
     CompanyRepository companyRepository;
+    ReviewRepository reviewRepository;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository) {
+    public CompanyServiceImpl(CompanyRepository companyRepository,ReviewRepository reviewRepository) {
         this.companyRepository = companyRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     @Override
@@ -51,6 +54,9 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public boolean deleteCompany(Long id) {
         if(companyRepository.existsById(id)) {
+            Company company = companyRepository.findById(id).orElse(null);
+            assert company != null;
+            reviewRepository.findByCompanyId(id).forEach(review -> reviewRepository.deleteAll());
             companyRepository.deleteById(id);
             return true;
         }

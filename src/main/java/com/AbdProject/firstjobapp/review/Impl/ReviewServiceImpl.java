@@ -50,7 +50,7 @@ public class ReviewServiceImpl implements ReviewService {
         Company company = companyService.getCompanyById(companyId);
         if (company != null) {
             List<Review> reviews = reviewRepository.findByCompanyId(companyId);
-            for(Review r : reviews) {
+            for (Review r : reviews) {
                 if (r.getId().equals(reviewId)) {
                     r.setDescription(review.getDescription());
                     r.setRating(review.getRating());
@@ -66,11 +66,18 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public boolean deleteReview(Long companyId, Long reviewId) {
-        if(getReview(companyId, reviewId) != null) {
-            reviewRepository.delete(getReview(companyId, reviewId));
+        if (companyService.getCompanyById(companyId) != null && reviewRepository.existsById(reviewId)) {
+            Review review = reviewRepository.findById(reviewId).orElse(null);
+            assert review != null;
+            Company company = review.getCompany();
+            company.getReviews().remove(review);
+            review.setCompany(null);
+            companyService.updateCompany(companyId, company);
+            reviewRepository.deleteById(reviewId);
             return true;
+
+        } else {
+            return false;
         }
-        return false;
     }
 }
-

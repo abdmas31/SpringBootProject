@@ -1,5 +1,6 @@
 package com.AbdProject.firstjobapp.company;
 
+import com.AbdProject.firstjobapp.review.ReviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import java.util.List;
 @RequestMapping("/companies")
 public class  CompanyController {
     private CompanyService companyService;
+    private ReviewService reviewService;
 
     public CompanyController(CompanyService companyService) {
         this.companyService = companyService;
@@ -42,6 +44,8 @@ public class  CompanyController {
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCompany(@PathVariable Long id) {
+        Company company = companyService.getCompanyById(id);
+
         boolean flag = companyService.deleteCompany(id);
         if (flag) {
             return new ResponseEntity<>("Company deleted successfully", HttpStatus.OK);
